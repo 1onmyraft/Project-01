@@ -1,90 +1,183 @@
-import java.time.*;
+import java.time.LocalDate;
 
-public class Book{
-    public const static final int ISBN_ = 0;
-    public const static final int TITLE_ = 1;
-    public const static final int SUBJECT_ = 2;
-    public const static final int PAGE_COUNT_ = 3;
-    public const static final int AUTHOR_ = 4;
-    public const static final int DUE_DATE_ = 5;
+import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
-    private String author;
-    private LocalDate dueDate;
-    private String isbn;
-    private int pageCount;
-    private String subject;
-    private String title;
+import java.time.LocalDate;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-    public Book(String author, String title, String subject, int pageCount, String isbn, LocalDate dueDate){
-        this.author = author;
-        this.title = title;
-        this.subject = subject;
-        this.pageCount = pageCount;
-        this.isbn = isbn;
-        this.dueDate = dueDate;
+
+/**
+ * @author Andrea Ultreras
+ * @since 2021.02.15
+ * Abstract: This file holds test variables and objects as well as
+ *           tests for the constructor and getters and setters.
+ *
+ * This test was written by an excellent student.
+ *
+ */
+class BookTest {
+    Book book;
+    Book book1;
+    Book book2;
+    Book book3;
+    Book book4;
+    String ISBN;
+    String Title;
+    String Subject;
+    int PageCount;
+    String Author;
+    LocalDate DueDate;
+    String ISBN_;
+    String Title_;
+    String Subject_;
+    int PageCount_;
+    String Author_;
+    LocalDate DueDate_;
+
+    //CONSTRUCTOR & DESTRUCTOR-----------------------------------------------------------
+    @BeforeEach
+    void setUp() {
+        //constructor test---
+        book = null;
+        assertNull(book);
+        book = new Book("", "", "", 0, "", LocalDate.of(2021, 2, 10));
+        assertNotNull(book);
+
+        //field setting and getter test---
+        ISBN = "1337";
+        Title = "Headfirst Java";
+        Subject = "education";
+        PageCount = 1337;
+        Author = "Grady Booch";
+        DueDate = LocalDate.of(2002, 1, 8);
+        book1 = new Book(ISBN, Title, Subject, PageCount, Author, DueDate);
+
+        //equality test---
+        book2 = new Book("5297", "Count of Monte Cristo", "Adventure", 999, "Alexandrea Dumas", LocalDate.of(2021, 1, 1));
+        book3 = new Book("5297", "Count of Monte Cristo", "Adventure", 999, "Alexandrea Dumas", LocalDate.of(2021, 1, 1));
+
+        //setter test---
+        book4 = new Book(ISBN, Title, Subject, PageCount, Author, DueDate);
+        ISBN_ = "34-w-34";
+        Title_ = "Dune";
+        Subject_ = "sci-fi";
+        PageCount_ = 235;
+        Author_ = "Frank Herbert";
+        DueDate_ = LocalDate.of(2020, 5, 12);
     }
 
-    public boolean equals(Object object) {
-        if (object == null || getClass() != object.getClass()) return false;
-        if (!super.equals(object)) return false;
-        Book book = (Book) object;
-        return ISBN_ == book.ISBN_ && TITLE_ == book.TITLE_ && SUBJECT_ == book.SUBJECT_ && PAGE_COUNT_ == book.PAGE_COUNT_ && AUTHOR_ == book.AUTHOR_ && DUE_DATE_ == book.DUE_DATE_;
+    @AfterEach
+    void tearDown() {
+        book = null;
+        book1 = null;
+        book2 = null;
+        book3 = null;
+        book4 = null;
+        ISBN = null;
+        Title = null;
+        Subject = null;
+        PageCount = 0;
+        Author = null;
+        DueDate = null;
     }
 
-    public int hashCode() {
-        return Objects.hash(super.hashCode(), ISBN_, TITLE_, SUBJECT_, PAGE_COUNT_, AUTHOR_, DUE_DATE_);
+    //GETTERS AND SETTERS----------------------------------------------------------------
+
+    @Test
+    void staticTest(){
+        assertEquals(0, Book.ISBN_);
+        assertEquals(1, Book.TITLE_);
+        assertEquals(2, Book.SUBJECT_);
+        assertEquals(3, Book.PAGE_COUNT_);
+        assertEquals(4, Book.AUTHOR_);
+        assertEquals(5, Book.DUE_DATE_);
     }
 
-    public String toString(){
-        return title + " by " + author + " ISBN: " + isbn;
+    @Test
+    void getISBN() {
+        assertEquals(ISBN, book1.getISBN());                //field setting and getter test
+        assertNotEquals(book1.getISBN(), book2.getISBN());  //equality test
+        assertEquals(book2.getISBN(), book3.getISBN());     //equality test
     }
 
-
-    public String getAuthor() {
-        return author;
+    @Test
+    void setISBN() {
+        book4.setISBN(ISBN_);                   //set value to new parameter, setter test
+        assertNotEquals(ISBN, book4.getISBN()); //setter test
+        assertEquals(ISBN_, book4.getISBN());   //setter test
     }
 
-    public void setAuthor(String author) {
-        this.author = author;
+    @Test
+    void getTitle() {
+        assertEquals(Title, book1.getTitle());
+        assertNotEquals(book1.getTitle(), book2.getTitle());
+        assertEquals(book2.getTitle(), book3.getTitle());
     }
 
-    public String getIsbn() {
-        return isbn;
+    @Test
+    void setTitle() {
+        book4.setTitle(Title_);
+        assertNotEquals(Title, book4.getTitle());
+        assertEquals(Title_, book4.getTitle());
     }
 
-    public void setIsbn(String isbn) {
-        this.isbn = isbn;
+    @Test
+    void getSubject() {
+        assertEquals(Subject, book1.getSubject());
+        assertNotEquals(book1.getSubject(), book2.getSubject());
+        assertEquals(book2.getSubject(), book3.getSubject());
     }
 
-    public LocalDate getDueDate() {
-        return dueDate;
+    @Test
+    void setSubject() {
+        book4.setSubject(Subject_);
+        assertNotEquals(Subject, book4.getSubject());
+        assertEquals(Subject_, book4.getSubject());
     }
 
-    public void setDueDate(LocalDate dueDate) {
-        this.dueDate = dueDate;
+    @Test
+    void getPageCount() {
+        assertEquals(PageCount, book1.getPageCount());
+        assertNotEquals(book1.getPageCount(), book2.getPageCount());
+        assertEquals(book2.getPageCount(), book3.getPageCount());
     }
 
-    public int getPageCount() {
-        return pageCount;
+    @Test
+    void setPageCount() {
+        book4.setPageCount(PageCount_);
+        assertNotEquals(PageCount, book4.getPageCount());
+        assertEquals(PageCount_, book4.getPageCount());
     }
 
-    public void setPageCount(int pageCount) {
-        this.pageCount = pageCount;
+    @Test
+    void getAuthor() {
+        assertEquals(Author, book1.getAuthor());
+        assertNotEquals(book1.getAuthor(), book2.getAuthor());
+        assertEquals(book2.getAuthor(), book3.getAuthor());
     }
 
-    public String getSubject() {
-        return subject;
+    @Test
+    void setAuthor() {
+        book4.setAuthor(Author_);
+        assertNotEquals(Author, book4.getAuthor());
+        assertEquals(Author_, book4.getAuthor());
     }
 
-    public void setSubject(String subject) {
-        this.subject = subject;
+    @Test
+    void getDueDate() {
+        assertEquals(DueDate, book1.getDueDate());
+        assertNotEquals(book1.getDueDate(), book2.getDueDate());
+        assertEquals(book2.getDueDate(), book3.getDueDate());
     }
 
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
+    @Test
+    void setDueDate() {
+        book4.setDueDate(DueDate_);
+        assertNotEquals(DueDate, book4.getDueDate());
+        assertEquals(DueDate_, book4.getDueDate());
     }
 }

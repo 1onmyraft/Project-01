@@ -1,3 +1,8 @@
+/*
+Author - Tyler Fleming
+Assignment - Book.java Project 1
+ */
+
 import java.time.*;
 import java.util.Objects;
 
