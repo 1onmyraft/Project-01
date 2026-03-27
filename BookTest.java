@@ -1,13 +1,12 @@
 import java.time.*;
-import java.util.Objects;
 
 public class Book{
-    public static final int ISBN_ = 0;
-    public static final int TITLE_ = 1;
-    public static final int SUBJECT_ = 2;
-    public static final int PAGE_COUNT_ = 3;
-    public static final int AUTHOR_ = 4;
-    public static final int DUE_DATE_ = 5;
+    public const static final int ISBN_ = 0;
+    public const static final int TITLE_ = 1;
+    public const static final int SUBJECT_ = 2;
+    public const static final int PAGE_COUNT_ = 3;
+    public const static final int AUTHOR_ = 4;
+    public const static final int DUE_DATE_ = 5;
 
     private String author;
     private LocalDate dueDate;
@@ -16,7 +15,7 @@ public class Book{
     private String subject;
     private String title;
 
-    public Book(String isbn, String title, String subject, int pageCount, String author, LocalDate dueDate){
+    public Book(String author, String title, String subject, int pageCount, String isbn, LocalDate dueDate){
         this.author = author;
         this.title = title;
         this.subject = subject;
@@ -25,7 +24,16 @@ public class Book{
         this.dueDate = dueDate;
     }
 
+    public boolean equals(Object object) {
+        if (object == null || getClass() != object.getClass()) return false;
+        if (!super.equals(object)) return false;
+        Book book = (Book) object;
+        return ISBN_ == book.ISBN_ && TITLE_ == book.TITLE_ && SUBJECT_ == book.SUBJECT_ && PAGE_COUNT_ == book.PAGE_COUNT_ && AUTHOR_ == book.AUTHOR_ && DUE_DATE_ == book.DUE_DATE_;
+    }
 
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), ISBN_, TITLE_, SUBJECT_, PAGE_COUNT_, AUTHOR_, DUE_DATE_);
+    }
 
     public String toString(){
         return title + " by " + author + " ISBN: " + isbn;
@@ -40,11 +48,11 @@ public class Book{
         this.author = author;
     }
 
-    public String getISBN() {
+    public String getIsbn() {
         return isbn;
     }
 
-    public void setISBN(String isbn) {
+    public void setIsbn(String isbn) {
         this.isbn = isbn;
     }
 
@@ -78,17 +86,5 @@ public class Book{
 
     public void setTitle(String title) {
         this.title = title;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (o == null || getClass() != o.getClass()) return false;
-        Book book = (Book) o;
-        return pageCount == book.pageCount && Objects.equals(author, book.author) && Objects.equals(dueDate, book.dueDate) && Objects.equals(isbn, book.isbn) && Objects.equals(subject, book.subject) && Objects.equals(title, book.title);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(author, dueDate, isbn, pageCount, subject, title);
     }
 }
