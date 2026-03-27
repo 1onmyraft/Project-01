@@ -1,10 +1,10 @@
 class Book{
-    public static final int ISBN_;
-    public static final int TITLE_;
-    public static final int SUBJECT_;
-    public static final int PAGE_COUNT_;
-    public static final int AUTHOR_;
-    public static final int DUE_DATE_;
+    public const static final int ISBN_ = 0;
+    public const static final int TITLE_ = 1;
+    public const static final int SUBJECT_ = 2;
+    public const static final int PAGE_COUNT_ = 3;
+    public const static final int AUTHOR_ = 4;
+    public const static final int DUE_DATE_ = 5;
 
     private String author;
     private LocalDate dueDate;
