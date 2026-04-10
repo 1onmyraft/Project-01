@@ -18,6 +18,7 @@ public class Library {
         name = s;
         shelves = new HashMap<>();
         books = new HashMap<>();
+        readers = new ArrayList<>();
     }
 
     public Code addBook(Book b){
@@ -344,17 +345,19 @@ public class Library {
 
             Reader reader = new Reader(cardNumber, name, phone);
 
-            int booksCount = convertInt(reader_str[Reader.BOOK_COUNT_], Code.SUCCESS);
+            int booksCount = convertInt(reader_str[3], Code.SUCCESS);
 
+            int tmp = 4;
             for (int j = 0; j < booksCount; j++)
             {
-                Book b = getBookByISBN(scan.next());
-                reader.addBook(b);
-                scan.next();
+                if (reader_str.length < tmp) {
+                    Book b = getBookByISBN(reader_str[tmp]);
+                    reader.addBook(b);
+                }
+                tmp += 2;
             }
 
             addReader(reader);
-            scan.nextLine();
         }
 
         return Code.SUCCESS;
