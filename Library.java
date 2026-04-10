@@ -21,6 +21,21 @@ public class Library {
     }
 
     public Code addBook(Book b){
+        if (books.containsKey(b)) {
+            books.put(b, books.get(b) + 1);
+            System.out.println(books.get(b) + " copies of "+b.getTitle()+" in the stacks");
+        }
+        else {
+            books.put(b, 1);
+            System.out.println(b.getTitle() + " added to the stacks.");
+        }
+
+        Shelf shelf = getShelf(b.getSubject());
+
+        if (shelf == null)
+            return Code.SHELF_EXISTS_ERROR;
+
+        shelf.addBook(b);
         return Code.SUCCESS;
     }
 
@@ -83,19 +98,38 @@ public class Library {
         if (shelf == null)
         {
             System.out.println("no shelf for " + book.getSubject() + " books!");
+            return Code.SHELF_SUBJECT_MISMATCH_ERROR;
+        }
 
+        if (shelf.getBookCount(book) < 1)
+        {
+            System.out.println("ERROR: no copies of "+book.getTitle()+" remain");
+            return Code.BOOK_NOT_IN_INVENTORY_ERROR;
         }
 
 
-        return Code.SUCCESS;
+        Code status = reader.addBook(book);
+        if ( status!= Code.SUCCESS) {
+            System.out.println("Couldn't checkout " + book.getTitle());
+            return status;
+        }
+
+        status = shelf.removeBook(book);
+
+        if (status == Code.SUCCESS)
+            System.out.println(book.getTitle() +" checked out successfully");
+
+        return status;
     }
 
     private static LocalDate convertDate(String s, Code c){
         String[] date = s.split("-");
 
+
         if (date.length != 3)
         {
-            System.out.println("ERROR: date conversion error, could not parse " + s);
+            if (!s.equals("0000"))
+                System.out.println("ERROR: date conversion error, could not parse " + s);
             System.out.println("Using default date (01-jan-1970)");
             return LocalDate.EPOCH;
         }
@@ -178,10 +212,21 @@ public class Library {
     }
 
     public Shelf getShelf(String subject){
+
+        if (shelves.containsKey(subject))
+            return shelves.get(subject);
+
+        System.out.println("No shelf for " + subject + " books");
+
         return null;
     }
 
     public Shelf getShelf(Integer shelfNumber){
+        for (Shelf s : shelves.values())
+            if (s.getShelfNumber() == shelfNumber)
+                return s;
+
+        System.out.println("No shelf number "+shelfNumber+" found");
         return null;
     }
 
@@ -245,32 +290,25 @@ public class Library {
 
         for (int i =0; i < bookCount; i++){
 
-            for (int j = 0; j <= 5; j++)
-                switch(j){
-                    case 4:
-                        author = scan.next();
-                        break;
-                    case 5:
-                        dueDate = convertDate(scan.next(), Code.SUCCESS);
+            String[] book_str = scan.nextLine().split(",");
+
+                        author = book_str[Book.AUTHOR_];
+
+                        dueDate = convertDate(book_str[Book.DUE_DATE_], Code.SUCCESS);
                         if (dueDate == null)
                             return Code.DATE_CONVERSION_ERROR;
-                        break;
-                    case 0:
-                        isbn = scan.next();
-                        break;
-                    case 3:
-                        int c = convertInt(scan.next(), Code.SUCCESS);
+
+                        isbn = book_str[Book.ISBN_];
+
+                        int c = convertInt(book_str[Book.PAGE_COUNT_], Code.SUCCESS);
                         if (c < 0)
                             return Code.PAGE_COUNT_ERROR;
                         pageCount = c;
-                        break;
-                    case 2:
-                        subject = scan.next();
-                        break;
-                    case 1:
-                        title = scan.next();
-                        break;
-                }
+
+                        subject = book_str[Book.SUBJECT_];
+
+                        title = book_str[Book.TITLE_];
+
             Book book = new Book(isbn,title, subject,pageCount, author, dueDate);
             addBook(book);
         }
@@ -288,27 +326,35 @@ public class Library {
 
         for (int i =0; i < readerCount; i++){
 
-            for (int j = 0; j <= 4; j++)
-                switch(j){
-                    case 0:
-                        name = scan.next();
-                        break;
-                    case 1:
-                        phone = scan.next();
-                        break;
-                    case 2:
-                        scan.next();
-                        break;
-                    case 3:
-                        int c = convertInt(scan.next(), Code.SUCCESS);
-                        if (c < 0)
-                            return Code.PAGE_COUNT_ERROR;
-                        cardNumber = c;
-                        break;
 
-                }
+
+            String[] reader_str = scan.nextLine().split(",");
+
+                        name = reader_str[Reader.NAME_];
+
+                        phone = reader_str[Reader.PHONE_];
+
+
+                        int c = convertInt(reader_str[Reader.CARD_NUMBER_], Code.SUCCESS);
+                        if (c < 0)
+                            return Code.READER_CARD_NUMBER_ERROR;
+                        cardNumber = c;
+
+
+
             Reader reader = new Reader(cardNumber, name, phone);
+
+            int booksCount = convertInt(reader_str[Reader.BOOK_COUNT_], Code.SUCCESS);
+
+            for (int j = 0; j < booksCount; j++)
+            {
+                Book b = getBookByISBN(scan.next());
+                reader.addBook(b);
+                scan.next();
+            }
+
             addReader(reader);
+            scan.nextLine();
         }
 
         return Code.SUCCESS;
@@ -316,51 +362,37 @@ public class Library {
 
     private Code initShelves(int shelfCount, Scanner scan){
         if (shelfCount < 1)
-            return Code.LIBRARY_ERROR;
+            return Code.SHELF_COUNT_ERROR;
 
-        String author = "";
-        LocalDate dueDate = null;
-        String isbn = "";
-        int pageCount = 0;
-        String subject = "";
-        String title = "";
+         int shelfNumber = 0;
+         String subject = "";
 
         for (int i =0; i < shelfCount; i++){
+            String[] shelves_str = scan.nextLine().split(",");
 
-            for (int j = 0; j <= 5; j++)
-                switch(j){
-                    case 0:
-                        author = scan.next();
-                        break;
-                    case 1:
-                        dueDate = convertDate(scan.next(), Code.SUCCESS);
-                        if (dueDate == null)
-                            return Code.DATE_CONVERSION_ERROR;
-                        break;
-                    case 2:
-                        isbn = scan.next();
-                        break;
-                    case 3:
-                        int c = convertInt(scan.next(), Code.SUCCESS);
+                        int c = convertInt(shelves_str[Shelf.SHELF_NUMBER_], Code.SUCCESS);
                         if (c < 0)
-                            return Code.PAGE_COUNT_ERROR;
-                        pageCount = c;
-                        break;
-                    case 4:
-                        subject = scan.next();
-                        break;
-                    case 5:
-                        title = scan.next();
-                }
-            Book book = new Book(isbn,title, subject,pageCount, author, dueDate);
-            addBook(book);
+                            return Code.SHELF_NUMBER_PARSE_ERROR;
+                        shelfNumber = c;
+
+                        subject = shelves_str[Shelf.SUBJECT_];
+
+            Shelf shelf = new Shelf(shelfNumber, subject);
+            addShelf(shelf);
         }
 
         return Code.SUCCESS;
     }
 
     public int listBooks(){
-        return 0;
+        int sum = 0;
+
+        for (Book b : books.keySet()) {
+            System.out.println(books.get(b) + " copies of " + b.toString());
+            sum += books.get(b);
+        }
+
+        return sum;
     }
 
     public int listReaders(){
@@ -383,12 +415,15 @@ public class Library {
         return readers.size();
     }
 
-    public int listShelves(boolean b){
-        return 0;
+    public int listShelves(boolean showBooks){
+            for (Shelf s : shelves.values())
+                System.out.println(showBooks ? s.listBooks() : s.toString());
+
+        return shelves.size();
     }
 
     public int listShelves(){
-        return 0;
+        return listShelves(false);
     }
 
     public Code removeReader(Reader r){
@@ -407,10 +442,32 @@ public class Library {
     }
 
     public Code returnBook(Reader r, Book b){
-        return Code.SUCCESS;
+        if (!r.hasBook(b)){
+            System.out.println(r.getName() + " doesn't have "+b.getTitle()+" checked out");
+            return Code.READER_DOESNT_HAVE_BOOK_ERROR;
+        }
+
+        if (!books.containsKey(b)){
+            return Code.BOOK_NOT_IN_INVENTORY_ERROR;
+        }
+
+        Code status = r.removeBook(b);
+        if (status != Code.SUCCESS){
+            System.out.println("Could not return "+ b.getTitle());
+            return status;
+        }
+
+        return status;
     }
 
-    public Code returnBook(Book b){
+    public Code returnBook(Book book){
+        Shelf tmp = getShelf(book.getSubject());
+
+        if (tmp == null)
+            return Code.SHELF_EXISTS_ERROR;
+
+        tmp.addBook(book);
+
         return Code.SUCCESS;
     }
 
