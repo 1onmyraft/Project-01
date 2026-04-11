@@ -12,7 +12,7 @@ public class Shelf{
     private String subject;
 
     public Shelf(){
-
+        books = new HashMap<>();
     }
 
     public Shelf(int i, String s) {
@@ -73,8 +73,9 @@ public class Shelf{
                 return Code.BOOK_NOT_IN_INVENTORY_ERROR;
 
             }else{
+                books.remove(b);
                 System.out.println( b.toString() + " successfully removed from shelf " + subject);
-                return Code.BOOK_NOT_IN_INVENTORY_ERROR;
+                return Code.SUCCESS;
             }
             }
         System.out.println(b.toString() + " is not on shelf " + subject);
