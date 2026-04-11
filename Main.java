@@ -8,7 +8,7 @@ public class Main {
     public static void main(String[] args) {
 
         Library csumb = new Library("CSUMB");
-        csumb.init("Library01.csv");
+        csumb.init("BadShelves1.csv");
         int numb = csumb.listBooks();
         System.out.println("total books: " + numb);
         numb = csumb.listReaders();
@@ -24,9 +24,10 @@ public class Main {
         csumb.addShelf("Romance");
         romance = csumb.getShelf("Romance");
         System.out.println(romance);
-        scifi.addBook(bestServedCold);
-        csumb.addBook(bestServedCold);
         csumb.addShelf("GrimDark");
+       scifi.addBook(bestServedCold);
+       csumb.addBook(bestServedCold);
+
         System.out.println("Done");
         csumb.listReaders(true);
         csumb.listShelves(true);

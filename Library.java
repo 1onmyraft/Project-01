@@ -28,7 +28,7 @@ public class Library {
         }
         else {
             books.put(b, 1);
-            System.out.println(b.getTitle() + " added to the stacks.");
+            System.out.println(b + " added to the stacks.");
         }
 
         Shelf shelf = getShelf(b.getSubject());
@@ -69,18 +69,35 @@ public class Library {
     }
 
     public Code addShelf(Shelf s){
+        if (shelves.containsValue(s))
+        {
+            System.out.println("ERROR: Shelf already exists " + s);
+            return Code.SHELF_EXISTS_ERROR;
+        }
+
+        int largest = 0;
+
+        for (String key : shelves.keySet())
+            if (shelves.get(key).getShelfNumber() > largest)
+                largest = shelves.get(key).getShelfNumber();
+
+        s.setShelfNumber(largest+1);
+        shelves.put(s.getSubject(), s);
+
         return Code.SUCCESS;
     }
 
     public Code addShelf(String s){
-        return Code.SUCCESS;
+        Shelf tmp = new Shelf(-1, s);
+        return addShelf(tmp);
     }
 
     public Code checkOutBook(Reader reader, Book book) {
 
         if (!readers.contains(reader))
         {
-            System.out.println(reader.getName() + " doesn't have an account here");
+
+            System.out.println(reader != null ? reader.getName() : "Invalid Reader" + " doesn't have an account here");
             return Code.READER_NOT_IN_LIBRARY_ERROR;
         }
 
@@ -129,9 +146,10 @@ public class Library {
 
         if (date.length != 3)
         {
-            if (!s.equals("0000"))
+            if (!s.equals("0000")) {
                 System.out.println("ERROR: date conversion error, could not parse " + s);
-            System.out.println("Using default date (01-jan-1970)");
+                System.out.println("Using default date (01-jan-1970)");
+            }
             return LocalDate.EPOCH;
         }
 
@@ -259,6 +277,8 @@ public class Library {
         Code status = ret(book_count);
         if (status != Code.SUCCESS)
             return status;
+
+
         initBooks(book_count, s);
         listBooks();
         int shelf_count = convertInt(s.nextLine(), Code.SUCCESS);
@@ -266,7 +286,7 @@ public class Library {
         if (status != Code.SUCCESS)
             return status;
         initShelves(shelf_count, s);
-        listShelves();
+        listShelves(true);
 
         int reader_count = convertInt(s.nextLine(), Code.SUCCESS);
         status = ret(reader_count);
@@ -289,9 +309,15 @@ public class Library {
          String subject = "";
          String title = "";
 
+         System.out.println("parsing " + bookCount + " books");
+
         for (int i =0; i < bookCount; i++){
 
-            String[] book_str = scan.nextLine().split(",");
+            String line = scan.nextLine();
+
+            String[] book_str = line.split(",");
+
+            System.out.println("parsing book: " + line);
 
                         author = book_str[Book.AUTHOR_];
 
@@ -314,6 +340,7 @@ public class Library {
             addBook(book);
         }
 
+        System.out.println("SUCCESS");
         return Code.SUCCESS;
     }
 
@@ -370,8 +397,15 @@ public class Library {
          int shelfNumber = 0;
          String subject = "";
 
+        System.out.println("parsing " + shelfCount + " shelves");
+
         for (int i =0; i < shelfCount; i++){
-            String[] shelves_str = scan.nextLine().split(",");
+            String line = scan.nextLine();
+
+            System.out.println("Parsing Shelf : " + line);
+            String[] shelves_str = line.split(",");
+
+
 
                         int c = convertInt(shelves_str[Shelf.SHELF_NUMBER_], Code.SUCCESS);
                         if (c < 0)
@@ -381,9 +415,16 @@ public class Library {
                         subject = shelves_str[Shelf.SUBJECT_];
 
             Shelf shelf = new Shelf(shelfNumber, subject);
+
             addShelf(shelf);
+            for (Book b : books.keySet())
+                if (b.getSubject().equals(shelf.getSubject())) {
+                    for (int j= books.get(b); j > 0; j--)
+                        shelf.addBook(b);
+                }
         }
 
+        System.out.println("SUCCESS");
         return Code.SUCCESS;
     }
 
@@ -394,7 +435,7 @@ public class Library {
             System.out.println(books.get(b) + " copies of " + b.toString());
             sum += books.get(b);
         }
-
+        System.out.println();
         return sum;
     }
 
@@ -445,6 +486,9 @@ public class Library {
     }
 
     public Code returnBook(Reader r, Book b){
+        if (r == null)
+            return Code.UNKNOWN_ERROR;
+
         if (!r.hasBook(b)){
             System.out.println(r.getName() + " doesn't have "+b.getTitle()+" checked out");
             return Code.READER_DOESNT_HAVE_BOOK_ERROR;

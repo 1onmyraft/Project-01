@@ -18,6 +18,7 @@ public class Shelf{
     public Shelf(int i, String s) {
         shelfNumber = i;
         subject = s;
+        books = new HashMap<>();
     }
 
     public Code addBook(Book b){
@@ -28,12 +29,15 @@ public class Shelf{
         else
             return Code.SHELF_SUBJECT_MISMATCH_ERROR;
 
-        System.out.println(b.toString() + " added to shelf " + this.subject);
+        System.out.println(b.toString() + " added to shelf " + toString());
         return Code.SUCCESS;
     }
 
     public int getBookCount(Book b){
-        return books.get(b);
+        if (books.containsKey(b))
+            return books.get(b);
+
+        return 0;
     }
 
     public HashMap<Book, Integer> getBooks(){
@@ -49,10 +53,16 @@ public class Shelf{
     }
 
     public String listBooks(){
-        StringBuilder sb = new StringBuilder();
-        sb.append(books.size()).append(" books on shelf: ").append(this.toString()).append("\n");
+
+        int sum = 0;
+
         for (Book b : books.keySet())
-            sb.append(b.getTitle()).append(" by ").append(b.getAuthor()).append(" ISBN:").append(b.getISBN()).append(" ").append(books.get(b));
+            sum += books.get(b);
+
+        StringBuilder sb = new StringBuilder();
+        sb.append(sum).append(sum == 1 ? " book on shelf:  " :" books on shelf: ").append(this.toString()).append("\n");
+        for (Book b : books.keySet())
+            sb.append(b.getTitle()).append(" by ").append(b.getAuthor()).append(" ISBN:").append(b.getISBN()).append(" ").append(books.get(b)).append("\n");
 
         return sb.toString();
     }
